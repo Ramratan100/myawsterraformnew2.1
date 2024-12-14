@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # VPC
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
@@ -39,6 +35,13 @@ resource "aws_security_group" "bastion_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -60,6 +63,13 @@ resource "aws_security_group" "mysql_sg" {
     cidr_blocks = ["10.0.2.0/24"]
   }
 
+ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -70,7 +80,7 @@ resource "aws_security_group" "mysql_sg" {
 
 # Bastion Host Instance
 resource "aws_instance" "bastion_host" {
-  ami             = "ami-0c02fb55956c7d316" # Amazon Linux 2 AMI
+  ami             = "ami-005fc0f236362e99f"
   instance_type   = "t2.micro"
   key_name        = "jenkins"
   subnet_id       = module.vpc.public_subnets[0]
@@ -83,7 +93,7 @@ resource "aws_instance" "bastion_host" {
 
 # MySQL Instance
 resource "aws_instance" "mysql_instance" {
-  ami             = "ami-0c02fb55956c7d316" # Amazon Linux 2 AMI
+  ami             = "ami-005fc0f236362e99f"
   instance_type   = "t2.micro"
   key_name        = "jenkins"
   subnet_id       = module.vpc.private_subnets[0]
@@ -92,12 +102,4 @@ resource "aws_instance" "mysql_instance" {
   tags = {
     Name = "MySQL-Instance"
   }
-}
-
-output "bastion_public_ip" {
-  value = aws_instance.bastion_host.public_ip
-}
-
-output "mysql_private_ip" {
-  value = aws_instance.mysql_instance.private_ip
 }
