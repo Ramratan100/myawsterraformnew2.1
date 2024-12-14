@@ -1,0 +1,5 @@
+[bastion]
+10.0.2.X ansible_ssh_user=ubuntu ansible_private_key_file=/path/to/jenkins.pem
+
+[mysql]
+10.0.1.X ansible_ssh_user=ubuntu ansible_private_key_file=/path/to/jenkins.pem

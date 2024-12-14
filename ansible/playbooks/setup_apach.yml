@@ -1,0 +1,29 @@
+- hosts: bastion
+  become: true
+  tasks:
+    - name: Update package cache
+      apt:
+        update_cache: yes
+
+    - name: Install Apache and PHP
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - apache2
+        - php
+        - libapache2-mod-php
+        - php-mysql
+
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted
+
+    - name: Create PHP test files
+      copy:
+        dest: /var/www/html/{{ item.filename }}
+        content: "{{ item.content }}"
+      loop:
+        - { filename: "info.php", content: "<?php phpinfo(); ?>" }
+        - { filename: "db_test.php", content: "<?php ... ?>" }  # Insert your db_test.php content here
